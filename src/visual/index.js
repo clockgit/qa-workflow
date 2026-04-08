@@ -1,14 +1,38 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
-const { chromium } = require('playwright');
-const { PNG } = require('pngjs');
-const pixelmatchModule = require('pixelmatch');
-const { getPathConfig, getRegionDefinitions } = require('../config');
+const { getPathConfig, getProjectRoot, getRegionDefinitions } = require('../config');
 const { getAuthStatePath } = require('../auth/auth-state');
 const { requiresLogin, resolveTarget } = require('../config/targets');
 
-const pixelmatch = pixelmatchModule.default || pixelmatchModule;
+let chromium;
+let PNG;
+let pixelmatch;
+
+function getChromium() {
+  if (!chromium) {
+    ({ chromium } = require('playwright'));
+  }
+
+  return chromium;
+}
+
+function getPngModule() {
+  if (!PNG) {
+    ({ PNG } = require('pngjs'));
+  }
+
+  return PNG;
+}
+
+function getPixelmatch() {
+  if (!pixelmatch) {
+    const pixelmatchModule = require('pixelmatch');
+    pixelmatch = pixelmatchModule.default || pixelmatchModule;
+  }
+
+  return pixelmatch;
+}
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 2200 },
@@ -16,7 +40,7 @@ const VIEWPORTS = [
   { name: 'phone', width: 430, height: 2200 },
 ];
 
-const ROOT_DIR = path.resolve(__dirname, '../..');
+const ROOT_DIR = getProjectRoot();
 const VISUAL_ROOT = path.join(ROOT_DIR, getPathConfig('visualDir', 'visual-regression'));
 const RUNS_DIR = path.join(ROOT_DIR, getPathConfig('visualRunsDir', 'visual-regression/runs'));
 const REPORTS_DIR = path.join(ROOT_DIR, getPathConfig('visualReportsDir', 'visual-regression/reports'));
@@ -273,7 +297,7 @@ async function captureSnapshot(snapshot, target, suite, csvPath) {
   const runDir = getRunDir(snapshot, target, suite);
   ensureDir(runDir);
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await getChromium().launch({ headless: true });
   const contextOptions = {
     ignoreHTTPSErrors: true,
   };
@@ -425,12 +449,13 @@ function loadManifest(snapshot, suite) {
 }
 
 function readPng(pngPath) {
-  return PNG.sync.read(fs.readFileSync(pngPath));
+  return getPngModule().sync.read(fs.readFileSync(pngPath));
 }
 
 function resizePng(png, width, height) {
-  const output = new PNG({ width, height });
-  PNG.bitblt(png, output, 0, 0, png.width, png.height, 0, 0);
+  const Png = getPngModule();
+  const output = new Png({ width, height });
+  Png.bitblt(png, output, 0, 0, png.width, png.height, 0, 0);
   return output;
 }
 
@@ -441,8 +466,9 @@ function compareImages(beforePath, afterPath, diffPath) {
   const height = Math.max(before.height, after.height);
   const beforeImage = before.width === width && before.height === height ? before : resizePng(before, width, height);
   const afterImage = after.width === width && after.height === height ? after : resizePng(after, width, height);
-  const diff = new PNG({ width, height });
-  const mismatchedPixels = pixelmatch(
+  const Png = getPngModule();
+  const diff = new Png({ width, height });
+  const mismatchedPixels = getPixelmatch()(
     beforeImage.data,
     afterImage.data,
     diff.data,
@@ -454,7 +480,7 @@ function compareImages(beforePath, afterPath, diffPath) {
 
   if (mismatchedPixels > 0) {
     ensureDir(path.dirname(diffPath));
-    fs.writeFileSync(diffPath, PNG.sync.write(diff));
+    fs.writeFileSync(diffPath, Png.sync.write(diff));
   }
 
   return {
@@ -617,7 +643,7 @@ function compareSnapshots(beforeSnapshot, afterSnapshot, suite, options = {}) {
     afterSnapshot,
     beforeEnvironment: before.target,
     afterEnvironment: after.target,
-    site: suite,
+    suite,
     regions,
     csvPath: beforeCsvPath,
     shareZipPath: path.relative(reportDir, shareZipPath),
@@ -629,7 +655,7 @@ function compareSnapshots(beforeSnapshot, afterSnapshot, suite, options = {}) {
       afterSnapshot,
       beforeEnvironment: before.target,
       afterEnvironment: after.target,
-      site: suite,
+      suite,
       csvPath: beforeCsvPath,
       shareZipPath: shareZipPath ? path.relative(reportDir, shareZipPath) : '',
       rows,
@@ -1344,7 +1370,16 @@ async function main() {
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+module.exports = {
+  buildSummaryPage,
+  compareSnapshots,
+  loadPaths,
+  main,
+};
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}

@@ -2,10 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const { getCsvSets, getDefaultCsvSetPath, getDefaultSuite, getPathConfig, listAllSuites, listTargetsForSuite } = require('../config');
+const { getCsvSets, getDefaultCsvSetPath, getDefaultSuite, getPathConfig, getProjectRoot, listAllSuites, listTargetsForSuite } = require('../config');
 const { createPrompt } = require('../run/workflow-utils');
 
-const ROOT_DIR = path.resolve(__dirname, '../..');
+const ROOT_DIR = getProjectRoot();
 const VISUAL_DIR = path.join(ROOT_DIR, getPathConfig('visualDir', 'visual-regression'));
 const RUNS_DIR = path.join(ROOT_DIR, getPathConfig('visualRunsDir', 'visual-regression/runs'));
 const REPORTS_DIR = path.join(ROOT_DIR, getPathConfig('visualReportsDir', 'visual-regression/reports'));
@@ -86,6 +86,12 @@ function listSnapshotsForSuite(suite) {
     .sort((left, right) => right.snapshot.localeCompare(left.snapshot));
 }
 
+function listSnapshotChoicesForSuite(suite, csvPath = '') {
+  return listSnapshotsForSuite(suite)
+    .filter((entry) => !csvPath || entry.csvPath === csvPath)
+    .map((entry) => entry.snapshot);
+}
+
 function formatCsvChoice(csvPath) {
   return csvPath ? path.basename(csvPath) : '(unknown csv)';
 }
@@ -134,9 +140,7 @@ async function chooseCsvFromSnapshots(prompt, suite) {
 }
 
 async function chooseSnapshot(prompt, label, suite, csvPath) {
-  const snapshots = listSnapshotsForSuite(suite)
-    .filter((entry) => entry.csvPath === csvPath)
-    .map((entry) => entry.snapshot);
+  const snapshots = listSnapshotChoicesForSuite(suite, csvPath);
 
   if (!snapshots.length) {
     return await prompt.ask(`${label} snapshot`, '');
@@ -273,7 +277,18 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+module.exports = {
+  buildSnapshotName,
+  getDefaultCsvFile,
+  listCsvFilesForSuite,
+  listSnapshotsForSuite,
+  listSnapshotChoicesForSuite,
+  main,
+};
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

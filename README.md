@@ -212,6 +212,7 @@ Current local development entry points in this repo:
 ```bash
 npm run qaw
 npm run smoke:cli
+npm test
 npm run record
 npm run run:interactive
 npm run visual:interactive
@@ -227,6 +228,12 @@ The package repo also includes a smoke check for CLI and config loading:
 
 ```bash
 npm run smoke:cli
+```
+
+Maintainer-facing package tests run with:
+
+```bash
+npm test
 ```
 
 ## Next Steps

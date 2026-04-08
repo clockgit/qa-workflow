@@ -39,6 +39,10 @@ function getConfig() {
   return loadConfig();
 }
 
+function getProjectRoot() {
+  return path.dirname(resolveConfigPath());
+}
+
 function firstKey(object = {}) {
   return Object.keys(object)[0] || '';
 }
@@ -188,6 +192,7 @@ module.exports = {
   getPersonaSupport,
   getPathConfig,
   getPaths,
+  getProjectRoot,
   getRegionDefinitions,
   isFullRegionEnabled,
   getSelectors,

@@ -2,6 +2,13 @@
   "name": "@lockweb/qa-workflow",
   "version": "1.0.0",
   "description": "Reusable QA workflow toolkit for Playwright setup, test recording, execution, reporting, and visual regression.",
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
   "bin": {
     "qaw": "./bin/qaw"
   },
@@ -19,7 +26,7 @@
     "update": "node src/cli/setup-workspace.js",
     "reset": "node src/cli/reset-workspace.js",
     "smoke:cli": "node src/cli/smoke.js",
-    "test": "playwright test",
+    "test": "node --test test/*.test.js",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "codegen": "playwright codegen",
