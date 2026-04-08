@@ -1,0 +1,18 @@
+{
+  "paths": {
+    "rootDir": "__ROOT_DIR__"
+  },
+  "suites": {
+    "sample-suite": {
+      "defaultRequiresLogin": false,
+      "targets": {
+        "sample": {
+          "baseUrl": "https://github.com/clockgit"
+        }
+      },
+      "csvSets": {
+        "sample": "__SAMPLE_CSV_PATH__"
+      }
+    }
+  }
+}

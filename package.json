@@ -1,0 +1,61 @@
+{
+  "name": "@lockweb/qa-workflow",
+  "version": "1.0.0",
+  "description": "Reusable QA workflow toolkit for Playwright setup, test recording, execution, reporting, and visual regression.",
+  "bin": {
+    "qaw": "./bin/qaw"
+  },
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./config": "./src/config/index.js",
+    "./targets": "./src/config/targets.js",
+    "./auth/auth-state": "./src/auth/auth-state.js",
+    "./support/persona-test": "./src/support/persona-test.ts"
+  },
+  "scripts": {
+    "qaw": "node ./bin/qaw",
+    "setup": "node src/cli/setup-workspace.js",
+    "update": "node src/cli/setup-workspace.js",
+    "reset": "node src/cli/reset-workspace.js",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "codegen": "playwright codegen",
+    "record": "node src/run/record-test.js",
+    "publish-recording": "node src/run/publish-recording.js",
+    "clean-recordings": "node src/run/clean-recordings.js",
+    "targets": "node src/run/list-targets.js",
+    "run": "node src/run/run-target.js",
+    "run:interactive": "node src/run/run-tests.js",
+    "run:tag": "node src/run/run-by-tag.js",
+    "run:site-tag": "node src/run/run-by-tag.js",
+    "run:ui": "node src/run/run-target.js ui",
+    "run:headed": "node src/run/run-target.js headed",
+    "run:codegen": "node src/run/run-target.js codegen",
+    "auth": "node src/run/create-auth-state.js",
+    "smoke:standard": "node src/run/run-standard-smoke.js",
+    "visual:interactive": "node src/visual/menu.js",
+    "visual:capture": "node src/visual/index.js capture",
+    "visual:compare": "node src/visual/index.js compare"
+  },
+  "keywords": [
+    "qa",
+    "workflow",
+    "playwright",
+    "visual-regression",
+    "test-automation"
+  ],
+  "author": {
+    "name": "Chris Lock"
+  },
+  "company": "Lock Web Development LLC",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.5.0",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0"
+  }
+}
