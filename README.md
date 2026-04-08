@@ -21,11 +21,19 @@ This package is public, but it is not open source at this time. It currently use
 
 ## CLI
 
-The package CLI is built around `qaw`, for example:
+The primary CLI entrypoints are:
 
 ```bash
+qaw
 qaw init
 qaw validate
+```
+
+`qaw` opens the interactive menu by default.
+
+Additional commands are available when a project wants to call the package more directly:
+
+```bash
 qaw menu
 qaw record
 qaw run
@@ -36,7 +44,7 @@ qaw visual compare
 
 ## Project Setup
 
-The package includes an interactive setup command:
+For a one-off setup command:
 
 ```bash
 npx qaw init
@@ -49,6 +57,8 @@ npx qaw init
 - create a sample visual regression CSV at `<rootDir>/visual-regression/sample.csv`
 - create `playwright.config.js`
 - add a local npm script such as `npm run qaw`
+
+After the package is installed in a project, the same commands can be run through the local binary or a repo script.
 
 The package also includes a config validation command:
 
@@ -119,6 +129,8 @@ Example:
   }
 }
 ```
+
+## Config Reference
 
 Configuration fields:
 
@@ -204,7 +216,11 @@ Consumer-owned:
 
 This package should not contain real consumer target URLs, real consumer CSVs, published specs, recorded specs, auth state, or project-specific persona switch logic.
 
-## Package Layout
+## Maintainer Notes
+
+The sections below are for package maintenance, not for consuming projects.
+
+### Package Layout
 
 Current package structure:
 
@@ -225,7 +241,7 @@ Current package structure:
 - `templates/`
   Sanitized files used by `qaw init`
 
-## Local Development
+### Local Development
 
 Common local development commands in this repo:
 
@@ -255,6 +271,8 @@ Maintainer-facing package tests run with:
 ```bash
 npm test
 ```
+
+### Published Package Contents
 
 Published package contents are intentionally limited to:
 
