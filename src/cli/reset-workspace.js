@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
 
-const rootDir = path.resolve(__dirname, '../..');
+const rootDir = process.cwd();
 const pathsToRemove = [
   path.join(rootDir, 'node_modules'),
   path.join(rootDir, 'test-results'),

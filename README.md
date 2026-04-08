@@ -58,6 +58,8 @@ npx qaw init
 - create `playwright.config.js`
 - add a local npm script such as `npm run qaw`
 
+`playwright.config.js` is required for running tests through `qa-workflow`. It scopes Playwright to the package-managed test directory so Playwright does not auto-discover unrelated `*.spec.*` files elsewhere in the repo.
+
 After the package is installed in a project, the same commands can be run through the local binary or a repo script.
 
 The package also includes a config validation command:
@@ -69,6 +71,7 @@ npx qaw validate --config ./qa-workflow.config.json
 `qaw validate` checks:
 
 - config file presence and JSON parsing
+- consumer `playwright.config.js` presence
 - `suites` structure
 - target definitions and `baseUrl` values
 - referenced CSV file paths
@@ -213,6 +216,8 @@ Consumer-owned:
 - recorded specs
 - saved auth state
 - persona switch modules and other project-specific support code
+
+If `playwright.config.js` is missing, `qaw run` may cause Playwright to scan unrelated tests in the consuming repo. The simplest fix is to run `npx qaw init` and create it.
 
 This package should not contain real consumer target URLs, real consumer CSVs, published specs, recorded specs, auth state, or project-specific persona switch logic.
 

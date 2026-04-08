@@ -3,7 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const workspaceDir = path.resolve(__dirname, '../..');
+const packageRoot = path.resolve(__dirname, '../..');
+const projectRoot = process.cwd();
 
 function parseCliArgs(argv) {
   const args = [...argv];
@@ -32,19 +33,18 @@ function parseCliArgs(argv) {
 
 function isInstalled() {
   const requiredPaths = [
-    path.join(workspaceDir, 'node_modules'),
-    path.join(workspaceDir, 'node_modules', '@playwright', 'test'),
-    path.join(workspaceDir, 'node_modules', 'playwright'),
+    path.join(projectRoot, 'node_modules'),
+    path.join(projectRoot, 'node_modules', '@playwright', 'test'),
+    path.join(projectRoot, 'node_modules', 'playwright'),
   ];
 
   return requiredPaths.every((target) => fs.existsSync(target));
 }
 
-function runWorkspaceScript(script) {
-  const result = spawnSync('npm', ['run', script], {
-    cwd: workspaceDir,
+function runNodeEntry(relativeScriptPath, args = []) {
+  const result = spawnSync(process.execPath, [path.join(packageRoot, relativeScriptPath), ...args], {
+    cwd: projectRoot,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
   });
 
   return result.status ?? 1;
@@ -82,39 +82,39 @@ async function main() {
     prompt.close();
 
     if (choice === 'Install Playwright workspace') {
-      process.exit(runWorkspaceScript('setup'));
+      process.exit(runNodeEntry('src/cli/setup-workspace.js'));
     }
 
     if (choice === 'Record test') {
-      process.exit(runWorkspaceScript('record'));
+      process.exit(runNodeEntry('src/run/record-test.js'));
     }
 
     if (choice === 'Publish recording') {
-      process.exit(runWorkspaceScript('publish-recording'));
+      process.exit(runNodeEntry('src/run/publish-recording.js'));
     }
 
     if (choice === 'Clean recorded specs') {
-      process.exit(runWorkspaceScript('clean-recordings'));
+      process.exit(runNodeEntry('src/run/clean-recordings.js'));
     }
 
     if (choice === 'Run tests') {
-      process.exit(runWorkspaceScript('run:interactive'));
+      process.exit(runNodeEntry('src/run/run-tests.js'));
     }
 
     if (choice === 'Visual regression') {
-      process.exit(runWorkspaceScript('visual:interactive'));
+      process.exit(runNodeEntry('src/visual/menu.js'));
     }
 
     if (choice === 'List targets') {
-      process.exit(runWorkspaceScript('targets'));
+      process.exit(runNodeEntry('src/run/list-targets.js'));
     }
 
     if (choice === 'Repair / Update Playwright workspace') {
-      process.exit(runWorkspaceScript('update'));
+      process.exit(runNodeEntry('src/cli/setup-workspace.js'));
     }
 
     if (choice === 'Reset Playwright workspace') {
-      process.exit(runWorkspaceScript('reset'));
+      process.exit(runNodeEntry('src/cli/reset-workspace.js'));
     }
   }
   finally {

@@ -53,6 +53,7 @@ function createSmokeFixture() {
   const rootDir = 'qa-workflow';
   const configPath = path.join(fixtureRoot, 'qa-workflow.config.json');
   const csvPath = path.join(fixtureRoot, rootDir, 'visual-regression', 'sample.csv');
+  const playwrightConfigPath = path.join(fixtureRoot, 'playwright.config.js');
 
   ensureDir(path.dirname(csvPath));
   fs.writeFileSync(
@@ -70,6 +71,11 @@ function createSmokeFixture() {
   );
 
   writeJson(configPath, JSON.parse(renderedConfig));
+  fs.writeFileSync(
+    playwrightConfigPath,
+    readTemplate(path.join(TEMPLATES_DIR, 'playwright.config.js')),
+    'utf8'
+  );
 
   return {
     fixtureRoot,

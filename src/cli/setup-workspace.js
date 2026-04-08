@@ -3,6 +3,7 @@ const { spawnSync } = require('node:child_process');
 function run(command, args) {
   const result = spawnSync(command, args, {
     stdio: 'inherit',
+    cwd: process.cwd(),
     shell: process.platform === 'win32',
   });
 
@@ -11,10 +12,7 @@ function run(command, args) {
   }
 }
 
-console.log('Installing package dependencies...');
-run('npm', ['install']);
-
-console.log('\nInstalling Playwright browsers...');
+console.log('Installing Playwright browsers...');
 run('npx', ['playwright', 'install']);
 
 console.log('\nWorkspace setup complete.');

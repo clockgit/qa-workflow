@@ -61,9 +61,12 @@
   "license": "UNLICENSED",
   "type": "commonjs",
   "devDependencies": {
+    "@types/node": "^25.5.0"
+  },
+  "dependencies": {
     "@playwright/test": "^1.59.1",
-    "@types/node": "^25.5.0",
     "pixelmatch": "^7.1.0",
+    "playwright": "^1.59.1",
     "pngjs": "^7.0.0"
   }
 }

@@ -1,9 +1,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const readline = require('node:readline');
-const { getPathConfig } = require('../config');
+const { getPathConfig, getProjectRoot } = require('../config');
 
-const recordedDir = path.resolve(__dirname, '../..', getPathConfig('recordedDir', 'tests/recorded'));
+const recordedDir = path.join(getProjectRoot(), getPathConfig('recordedDir', 'tests/recorded'));
 
 function ask(question) {
   const rl = readline.createInterface({
@@ -24,10 +24,28 @@ function listRecordedSpecs() {
     return [];
   }
 
-  return fs.readdirSync(recordedDir)
-    .filter((file) => file.endsWith('.ts'))
-    .map((file) => path.join(recordedDir, file))
-    .sort();
+  const files = [];
+
+  function walk(currentDir) {
+    const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const nextPath = path.join(currentDir, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(nextPath);
+        continue;
+      }
+
+      if (entry.name.endsWith('.ts')) {
+        files.push(nextPath);
+      }
+    }
+  }
+
+  walk(recordedDir);
+
+  return files.sort();
 }
 
 async function main() {

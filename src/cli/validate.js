@@ -78,6 +78,17 @@ function validatePaths(config, projectRoot, errors, warnings) {
   }
 }
 
+function validatePlaywrightConfig(projectRoot, errors) {
+  const playwrightConfigPath = path.join(projectRoot, 'playwright.config.js');
+
+  if (!fs.existsSync(playwrightConfigPath)) {
+    pushError(
+      errors,
+      'playwright.config.js was not found in the project root. qa-workflow requires a consumer Playwright config to scope test discovery correctly. Run "npx qaw init" and choose "Create playwright.config.js".'
+    );
+  }
+}
+
 function validatePersonaSupport(suiteName, suiteConfig, projectRoot, errors) {
   const personas = suiteConfig.personas || {};
   const personaSupport = suiteConfig.personaSupport || {};
@@ -214,6 +225,7 @@ function validateConfigShape(config, configPath) {
   }
 
   validatePaths(config, projectRoot, errors, warnings);
+  validatePlaywrightConfig(projectRoot, errors);
 
   const suites = config.suites;
 
