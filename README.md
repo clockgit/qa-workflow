@@ -211,6 +211,7 @@ Current local development entry points in this repo:
 
 ```bash
 npm run qaw
+npm run smoke:cli
 npm run record
 npm run run:interactive
 npm run visual:interactive
@@ -220,6 +221,12 @@ The short CLI name exposed by the package is:
 
 ```bash
 qaw
+```
+
+The package repo also includes a smoke check for CLI and config loading:
+
+```bash
+npm run smoke:cli
 ```
 
 ## Next Steps
