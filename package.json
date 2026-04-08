@@ -10,7 +10,7 @@
     "LICENSE"
   ],
   "bin": {
-    "qaw": "./bin/qaw"
+    "qaw": "bin/qaw"
   },
   "main": "src/index.js",
   "exports": {
