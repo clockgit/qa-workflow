@@ -2,14 +2,14 @@
 
 Playwright-powered QA workflow tooling for recording tests, running targeted test sets, capturing visual baselines, comparing snapshots, and generating shareable reports.
 
-This package is being shaped toward a reusable CLI-first workflow built around the `qaw` command.
+This package is built around a reusable CLI-first workflow exposed through `qaw`.
 
 Author: Chris Lock
 Owner: Lock Web Development LLC
 
 ## Status
 
-This package is public, but it is not open source at this time. The package currently uses the `UNLICENSED` license while the public API, package structure, and reuse terms are still being finalized.
+This package is public, but it is not open source at this time. It currently uses the `UNLICENSED` license while the public API and reuse terms are still being finalized.
 
 ## Goals
 
@@ -19,9 +19,9 @@ This package is public, but it is not open source at this time. The package curr
 - Provide visual regression capture and compare workflows.
 - Generate review-friendly reports that are easier to share with stakeholders.
 
-## Planned CLI
+## CLI
 
-The intended end-state interface is a CLI built around `qaw`, for example:
+The package CLI is built around `qaw`, for example:
 
 ```bash
 qaw init
@@ -33,8 +33,6 @@ qaw publish
 qaw visual capture
 qaw visual compare
 ```
-
-The current repository is still being refactored toward that package shape.
 
 ## Project Setup
 
@@ -66,8 +64,9 @@ npx qaw validate --config ./qa-workflow.config.json
 - referenced CSV file paths
 - persona support module paths when personas are configured
 - selector and boolean field types
+- basic path configuration sanity
 
-## Configuration Direction
+## Configuration
 
 The tool is structured around project-level configuration rather than hardcoded project logic.
 
@@ -178,36 +177,57 @@ Persona behavior:
   - no auth required = anonymous user
   - auth required = base logged-in user
 
-## Development Direction
+## Repo Boundary
 
-The long-term split is:
+`qa-workflow` is the shared engine. Consuming repositories own their local setup and assets.
 
-- package repo: CLI, engine, reporting, config loading, shared templates
-- consuming repo: local config, CSV sets, specs, and generated artifacts
+Package-owned:
 
-Current ownership boundary:
+- CLI entrypoints
+- config loading and default resolution
+- auth orchestration
+- run / record / publish logic
+- visual capture, compare, and reporting
+- generic persona orchestration
+- sanitized scaffolding in `templates/`
 
-- package-owned:
-  - CLI entrypoints
-  - run / record / publish / visual workflow logic
-  - config loading and default resolution
-  - auth orchestration
-  - visual regression capture, compare, and reporting
-  - generic persona orchestration
-- consumer-owned:
-  - `qa-workflow.config.json`
-  - suite definitions and target URLs
-  - visual regression CSV files
-  - published specs
-  - recorded specs
-  - saved auth state
-  - persona switch modules and any project-specific support code
+Consumer-owned:
 
-In other words, this package should contain reusable engine code, while project-specific setup and test assets stay in the consuming repository.
+- `qa-workflow.config.json`
+- `playwright.config.js`
+- suite definitions and target URLs
+- visual regression CSV files
+- published specs
+- recorded specs
+- saved auth state
+- persona switch modules and other project-specific support code
+
+This package should not contain real consumer target URLs, real consumer CSVs, published specs, recorded specs, auth state, or project-specific persona switch logic.
+
+## Package Layout
+
+Current package structure:
+
+- `bin/`
+  Thin CLI entrypoints such as `qaw`
+- `src/cli/`
+  Command parsing, menu flow, setup, validation, and maintenance commands
+- `src/config/`
+  Config loading, defaults, and target resolution
+- `src/auth/`
+  Auth state and login helpers
+- `src/run/`
+  Record, publish, run, and listing flows
+- `src/visual/`
+  Visual capture, compare, report generation, and visual menu flow
+- `src/support/`
+  Package-owned support helpers such as persona orchestration
+- `templates/`
+  Sanitized files used by `qaw init`
 
 ## Local Development
 
-Current local development entry points in this repo:
+Common local development commands in this repo:
 
 ```bash
 npm run qaw
@@ -236,9 +256,10 @@ Maintainer-facing package tests run with:
 npm test
 ```
 
-## Next Steps
+Published package contents are intentionally limited to:
 
-- finish extracting project-specific behavior into config
-- stabilize the CLI command surface
-- separate engine code from copied starter structure
-- define the first supported public package shape
+- `bin/`
+- `src/`
+- `templates/`
+- `README.md`
+- `LICENSE`
